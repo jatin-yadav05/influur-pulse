@@ -17,8 +17,10 @@ import React, {
   useRef,
 } from "react";
 
-import { Button, ButtonProps } from "@/components/ui/button";
+// Import only Button, not ButtonProps, to avoid the lint error
+import { Button } from "@/components/ui/button";
 
+// Use React.ButtonHTMLAttributes<HTMLButtonElement> as an alternative to ButtonProps
 type Api = {
   fire: (options?: ConfettiOptions) => void;
 };
@@ -109,7 +111,8 @@ ConfettiComponent.displayName = "Confetti";
 // Export as Confetti
 export const Confetti = ConfettiComponent;
 
-interface ConfettiButtonProps extends ButtonProps {
+// Use React.ButtonHTMLAttributes<HTMLButtonElement> instead of ButtonProps
+interface ConfettiButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   options?: ConfettiOptions &
     ConfettiGlobalOptions & { canvas?: HTMLCanvasElement };
   children?: React.ReactNode;

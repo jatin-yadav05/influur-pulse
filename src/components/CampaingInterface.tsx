@@ -189,12 +189,12 @@ const InfluurPulse = () => {
       setUploadProgress(prev => {
         if (prev >= 100) {
           clearInterval(uploadInterval);
-          setTimeout(startAnalysis, 500);
+          setTimeout(startAnalysis, 800); 
           return 100;
         }
         return prev + 8;
       });
-    }, 150);
+    }, 180);
   };
 
   const startAnalysis = () => {
@@ -541,14 +541,14 @@ const InfluurPulse = () => {
                       hidden: { opacity: 0, filter: "blur(24px)", y: 30 },
                       visible: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
                     }}
-                    className="space-y-4 sm:space-y-6 animate-fade-in"
+                    className="space-y-4 sm:space-y-6 animate-fade-in backdrop-blur-2xl"
                   >
                     <motion.div
                       variants={{
                         hidden: { opacity: 0, filter: "blur(24px)", y: 20 },
                         visible: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
                       }}
-                      className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-2xl p-4 sm:p-6"
+                      className="bg-black/80 backdrop-blur-3xl border border-white/10 rounded-2xl p-4 sm:p-6"
                     >
                       <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3 sm:mb-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
@@ -922,7 +922,15 @@ const InfluurPulse = () => {
                 <div className="flex flex-col items-center gap-4 pt-4">
                   <button
                     className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl font-bold text-lg text-white shadow-xl hover:shadow-orange-500/30 transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer"
-                    onClick={handleLaunchConfetti}
+                    onClick={(() => {
+                      let lastClick = 0;
+                      return (e: React.MouseEvent<HTMLButtonElement>) => {
+                        const now = Date.now();
+                        if (now - lastClick < 1700) return;
+                        lastClick = now;
+                        handleLaunchConfetti();
+                      };
+                    })()}
                   >
                     <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12 pointer-events-none"></div>
                     <span className="relative z-10">Launch Campaign</span>
