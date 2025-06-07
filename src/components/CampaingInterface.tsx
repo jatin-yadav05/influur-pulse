@@ -959,6 +959,17 @@ const InfluurPulse = () => {
           </AnimatePresence>
         </div>
       </div>
+      {/* Minimal designer credit bottom left */}
+      <a
+        href="https://x.com/jatinyadav_05"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 left-4 z-50 text-xs text-white/40 hover:text-orange-400 transition-colors duration-200 font-mono"
+        style={{letterSpacing: '0.01em'}}
+        aria-label="Designed by @jatinyadav (Twitter)"
+      >
+        Designed by <span className="font-semibold">@jatinyadav</span>
+      </a>
     </div>
   );
 };
