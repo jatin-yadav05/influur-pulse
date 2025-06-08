@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ export const PinContainer = ({
   const [transform, setTransform] = useState(
     "translate(-50%,-50%) rotateX(0deg)"
   );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const onMouseEnter = () => {
     setTransform("translate(-50%,-50%) rotateX(40deg) scale(0.8)");
@@ -27,8 +28,28 @@ export const PinContainer = ({
     setTransform("translate(-50%,-50%) rotateX(0deg) scale(1)");
   };
 
+  // On mount, if the cursor is already over the container, trigger the transform
+  useEffect(() => {
+    const ref = containerRef.current;
+    if (!ref) return;
+    const handle = (e: MouseEvent) => {
+      const rect = ref.getBoundingClientRect();
+      if (
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom
+      ) {
+        setTransform("translate(-50%,-50%) rotateX(40deg) scale(0.8)");
+      }
+    };
+    window.addEventListener('mousemove', handle, { once: true });
+    return () => window.removeEventListener('mousemove', handle);
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       className={cn(
         "relative group/pin z-50  cursor-pointer",
         containerClassName

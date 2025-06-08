@@ -47,6 +47,8 @@ const InfluurPulse = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visualizerReady, setVisualizerReady] = useState(false);
   const [hoveredVideo, setHoveredVideo] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
 
   // Mouse tracking for subtle interactions
   useEffect(() => {
@@ -183,7 +185,38 @@ const InfluurPulse = () => {
     if (!isAnalyzing) setVisualizerReady(false);
   }, [isAnalyzing]);
 
+  // File upload handlers
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragActive(false);
+  };
+
+  // Update handleCampaignLaunch to use selectedFile
   const handleCampaignLaunch = () => {
+    // if (!selectedFile) return;
     setUploadProgress(0);
     const uploadInterval = setInterval(() => {
       setUploadProgress(prev => {
@@ -282,43 +315,43 @@ const InfluurPulse = () => {
   const InfluencerCard = ({ influencer, index }: { influencer: any; index: number; }) => {
     return (
       <div
-        className="relative bg-transparent backdrop-blur-xl border border-white/10 rounded-3xl p-4 transition-transform duration-300"
+        className="relative bg-transparent backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-2 transition-transform duration-300"
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between mb-6 max-sm:mb-3">
+          <div className="flex items-center space-x-4 max-sm:space-x-2">
             <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 max-sm:w-10 max-sm:h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <img
                   src={influencer.imgSrc}
                   alt={influencer.name}
-                  className="w-16 h-16 object-cover rounded-2xl"
+                  className="w-16 h-16 max-sm:w-10 max-sm:h-10 object-cover rounded-2xl"
                 />
               </div>
               {influencer.verified && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Check className="w-3 h-3 text-white" />
+                <div className="absolute -top-1 -right-1 w-6 h-6 max-sm:w-4 max-sm:h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Check className="w-3 h-3 max-sm:w-2 max-sm:h-2 text-white" />
                 </div>
               )}
             </div>
             <div>
-              <h4 className="font-semibold text-white text-lg">@{influencer.name}</h4>
-              <p className="text-white/60">{influencer.followers} followers</p>
+              <h4 className="font-semibold text-white text-lg max-lg:text-sm">@{influencer.name}</h4>
+              <p className="text-white/60 text-sm max-sm:text-[10px]">{influencer.followers} <span className="hidden max-sm:inline">followers</span></p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-lg font-bold text-orange-400">{influencer.match}%</div>
-            <div className="text-sm text-white/50">AI Match</div>
+            <div className="text-lg max-sm:text-base font-bold text-orange-400">{influencer.match}%</div>
+            <div className="text-sm max-sm:text-xs text-white/50">AI Match</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6 max-sm:gap-3">
           <div className="space-y-1">
-            <div className="text-white/50 text-sm">Engagement Rate</div>
-            <div className="text-white font-semibold text-lg">{influencer.engagement}</div>
+            <div className="text-white/50 text-sm max-sm:text-xs">Engagement Rate</div>
+            <div className="text-white font-semibold text-lg max-sm:text-base">{influencer.engagement}</div>
           </div>
           <div className="space-y-1">
-            <div className="text-white/50 text-sm">Campaign Cost</div>
-            <div className="text-white font-semibold text-lg">{influencer.cost}</div>
+            <div className="text-white/50 text-sm max-sm:text-xs">Campaign Cost</div>
+            <div className="text-white font-semibold text-lg max-sm:text-base">{influencer.cost}</div>
           </div>
         </div>
       </div>
@@ -502,13 +535,47 @@ const InfluurPulse = () => {
                         visible: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
                       }}
                     >
-                      <PinContainer title="Upload Your Track">
-                        <div className="group w-xl max-md:w-md max-sm:w-3xs bg-white/[0.02] backdrop-blur-xl border-2 border-dashed border-white/20 rounded-2xl p-6 sm:p-8 md:p-10 hover:border-orange-500/40 hover:bg-white/[0.03] transition-all duration-500 cursor-pointer">
-                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-500">
-                            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
-                          </div>
-                          <h3 className="text-lg sm:text-xl font-semibold text-white mb-1 sm:mb-2">Drop your track here</h3>
-                          <p className="text-white/50 text-sm sm:text-base">MP3, WAV, FLAC • Max 100MB</p>
+                      <PinContainer title={selectedFile ? 'Remove your track' : 'Upload Your Track'}>
+                        <div
+                          className={`group w-xl max-md:w-md max-sm:w-3xs bg-white/[0.02] backdrop-blur-xl border-2 border-dashed ${dragActive ? 'border-orange-500/60 bg-orange-500/5' : 'border-white/20'} rounded-2xl p-6 sm:p-8 md:p-10 hover:border-orange-500/40 hover:bg-white/[0.03] transition-all duration-500 cursor-pointer flex flex-col items-center justify-center`}
+                          onClick={() => document.getElementById('file-upload-input')?.click()}
+                          onDrop={handleDrop}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          tabIndex={0}
+                          style={{ outline: dragActive ? '2px solid #ff6600' : 'none' }}
+                        >
+                          <input
+                            id="file-upload-input"
+                            type="file"
+                            accept="audio/*"
+                            className="hidden"
+                            onChange={handleFileChange}
+                          />
+                          {selectedFile ? (
+                            <div className="flex flex-col items-center space-y-3 w-full">
+                              <span className="text-white font-semibold text-base sm:text-lg truncate max-w-xs">{selectedFile.name}</span>
+                              <button
+                                className="px-3 py-1 rounded bg-red-500/20 hover:bg-red-500/40 text-red-400 text-xs font-medium transition-colors duration-200"
+                                onClick={e => { e.stopPropagation(); setSelectedFile(null); }}
+                                type="button"
+                              >
+                                Remove File
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
+                              </div>
+                              <h3 className="text-lg sm:text-xl font-semibold text-white mb-1 sm:mb-2">
+                                Drop your track here
+                              </h3>
+                              <p className="text-white/50 text-sm sm:text-base">
+                                MP3, WAV, FLAC • Max 100MB
+                              </p>
+                            </>
+                          )}
                         </div>
                       </PinContainer>
                     </motion.div>
@@ -555,7 +622,7 @@ const InfluurPulse = () => {
                           <Music className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
                         <div className="flex-1 text-center sm:text-left">
-                          <h3 className="font-semibold text-white text-base sm:text-lg">gods_plan.mp3</h3>
+                          <h3 className="font-semibold text-white text-base sm:text-lg">{selectedFile ? selectedFile.name : "God's Plan"}</h3>
                           <p className="text-white/60 text-xs sm:text-sm">3.2 MB • Processing...</p>
                         </div>
                         <span className="text-orange-500 font-bold text-base sm:text-lg">{uploadProgress}%</span>
