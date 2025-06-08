@@ -315,7 +315,7 @@ const InfluurPulse = () => {
   const InfluencerCard = ({ influencer, index }: { influencer: any; index: number; }) => {
     return (
       <div
-        className="relative bg-transparent backdrop-blur-xl border border-white/10 rounded-3xl p-4 sm:p-2 transition-transform duration-300"
+        className="relative bg-transparent backdrop-blur-xl border border-white/10 rounded-3xl p-4 max-sm:p-2 transition-transform duration-300"
       >
         <div className="flex items-center justify-between mb-6 max-sm:mb-3">
           <div className="flex items-center space-x-4 max-sm:space-x-2">
